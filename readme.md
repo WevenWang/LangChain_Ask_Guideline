@@ -27,3 +27,7 @@ To use the application, run the `main.py` file with the streamlit CLI (after hav
 ```
 streamlit run app.py
 ```
+
+## Cache
+
+The application uses a cache to store the embeddings of the chunks. This is to avoid having to recompute the embeddings every time the user asks a question. The cache is stored in the `cache` folder. If you want to clear the cache, you can delete the contents of the `cache` folder.
