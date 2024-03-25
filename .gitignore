@@ -9,6 +9,8 @@ __pycache__/
 # cache files
 cache/
 
+# knowledge base cache
+knowledge_base/
 # Distribution / packaging
 .Python
 build/

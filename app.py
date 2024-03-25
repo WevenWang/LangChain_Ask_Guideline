@@ -19,9 +19,22 @@ def main():
     st.header("Ask New Wave Guidelines" )
     
     
+    knowledge_base = load_knowledge_base()
     
-    # extract the text
-    # if pdf is not None:   
+    # show user input
+    user_question = st.text_input("Ask a question about your New Wave Guidelines:")
+    if user_question:
+      docs = knowledge_base.similarity_search(user_question)
+      
+      llm = OpenAI()
+      chain = load_qa_chain(llm, chain_type="stuff")
+      with get_openai_callback() as cb:
+        response = chain.run(input_documents=docs, question=user_question)
+        print(cb)
+          
+      st.write(response)
+
+def load_knowledge_base():
     pdf_reader = PdfReader('assets/new_wave_guideline.pdf')
     text = ""
     for page in pdf_reader.pages:
@@ -46,22 +59,16 @@ def main():
     cached_embedder = CacheBackedEmbeddings.from_bytes_store(
         embeddings, store, namespace=embeddings.model
     )
+    # check if knowledge base is saved locally
+    try:
+      knowledge_base = FAISS.load_local("knowledge_base", cached_embedder)
+      print("Loaded knowledge base from local storage")
+    except:
+      knowledge_base = FAISS.from_texts(chunks, cached_embedder)
+      knowledge_base.save_local("knowledge_base")
+      print("Saved knowledge base to local storage")
+    return knowledge_base
 
-    knowledge_base = FAISS.from_texts(chunks, cached_embedder)
-    
-    # show user input
-    user_question = st.text_input("Ask a question about your New Wave Guidelines:")
-    if user_question:
-      docs = knowledge_base.similarity_search(user_question)
-      
-      llm = OpenAI()
-      chain = load_qa_chain(llm, chain_type="stuff")
-      with get_openai_callback() as cb:
-        response = chain.run(input_documents=docs, question=user_question)
-        print(cb)
-          
-      st.write(response)
-    
 
 if __name__ == '__main__':
     main()
