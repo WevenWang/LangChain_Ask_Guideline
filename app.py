@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import streamlit as st
-from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
+# from PyPDF2 import PdfReader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
@@ -9,8 +9,7 @@ from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
-import io
-import requests
+from langchain.document_loaders import PyMuPDFLoader
 
 
 def main():
@@ -35,19 +34,18 @@ def main():
       st.write(response)
 
 def load_knowledge_base():
-    pdf_reader = PdfReader('assets/new_wave_guideline.pdf')
-    text = ""
-    for page in pdf_reader.pages:
-      text += page.extract_text()
-      
+    loader = PyMuPDFLoader('assets/new_wave_guideline.pdf')
+    documents = loader.load()
+    
+    
     # split into chunks
-    text_splitter = CharacterTextSplitter(
-      separator="\n",
+    text_splitter = RecursiveCharacterTextSplitter(
+      separators=["\n", ".", "?", "!", ",", ";", ":", "\t", "\r", "\f"],
       chunk_size=1000,
       chunk_overlap=200,
       length_function=len
     )
-    chunks = text_splitter.split_text(text)
+    chunks = text_splitter.split_documents(documents)
     
     # create embeddings
     embeddings = OpenAIEmbeddings()
@@ -64,7 +62,7 @@ def load_knowledge_base():
       knowledge_base = FAISS.load_local("knowledge_base", cached_embedder)
       print("Loaded knowledge base from local storage")
     except:
-      knowledge_base = FAISS.from_texts(chunks, cached_embedder)
+      knowledge_base = FAISS.from_documents(chunks, cached_embedder)
       knowledge_base.save_local("knowledge_base")
       print("Saved knowledge base to local storage")
     return knowledge_base
