@@ -29,3 +29,5 @@ streamlit run app.py
 ## Cache
 
 The application uses a cache to store the embeddings of the chunks. This is to avoid having to recompute the embeddings every time the user asks a question. The cache is stored in the `cache` folder. If you want to clear the cache, you can delete the contents of the `cache` folder.
+
+It also uses FAISS to speed up the search for similar chunks. The FAISS index is stored in the `knowledge_base` folder. If you want to clear the FAISS index, you can delete the contents of the `knowledge_base` folder. The index will be reused for the same document.
