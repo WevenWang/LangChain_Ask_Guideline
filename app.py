@@ -64,13 +64,9 @@ def load_knowledge_base():
         embeddings, store, namespace=embeddings.model
     )
     # check if knowledge base is saved locally
-    try:
-      knowledge_base = FAISS.load_local("knowledge_base", cached_embedder)
-      print("Loaded knowledge base from local storage")
-    except:
-      knowledge_base = FAISS.from_documents(chunks, cached_embedder)
-      knowledge_base.save_local("knowledge_base")
-      print("Saving knowledge base to local storage")
+    
+    knowledge_base = FAISS.from_documents(chunks, cached_embedder)
+      
     return knowledge_base
 
 
