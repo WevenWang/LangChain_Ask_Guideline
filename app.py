@@ -9,6 +9,7 @@ from langchain.callbacks import get_openai_callback
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+from langchain.document_loaders import PyMuPDFLoader
 import os
 
 
@@ -36,9 +37,7 @@ def main():
 
 def load_knowledge_base():
     file_path = 'assets/new_wave_guideline.pdf'
-    loader = AzureAIDocumentIntelligenceLoader(
-        api_endpoint=os.getenv('AZURE_COGNITIVE_ENDPOINT'), api_key=os.getenv('AZURE_COGNITIVE_KEY'), file_path=file_path, api_model="prebuilt-layout"
-    )
+    loader = PyMuPDFLoader(file_path)
       
     documents = loader.load()
 
@@ -47,8 +46,8 @@ def load_knowledge_base():
     
     # split into chunks
     text_splitter = RecursiveCharacterTextSplitter(
-      separators=["\n", "|"],
-      chunk_size=5000,
+      separators=["\n\n", "\n", " ",  ""],
+      chunk_size=3000,
       chunk_overlap=200,
       length_function=len
     )
@@ -71,7 +70,7 @@ def load_knowledge_base():
     except:
       knowledge_base = FAISS.from_documents(chunks, cached_embedder)
       knowledge_base.save_local("knowledge_base")
-      print("Saved knowledge base to local storage")
+      print("Saving knowledge base to local storage")
     return knowledge_base
 
 
