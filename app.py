@@ -48,7 +48,7 @@ def load_knowledge_base():
     # split into chunks
     text_splitter = RecursiveCharacterTextSplitter(
       separators=["\n", "|"],
-      chunk_size=1000,
+      chunk_size=5000,
       chunk_overlap=200,
       length_function=len
     )
