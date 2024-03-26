@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import streamlit as st
-# from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -9,7 +8,8 @@ from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
-from langchain.document_loaders import PyMuPDFLoader
+from langchain_community.document_loaders import AzureAIDocumentIntelligenceLoader
+import os
 
 
 def main():
@@ -33,14 +33,21 @@ def main():
           
       st.write(response)
 
+
 def load_knowledge_base():
-    loader = PyMuPDFLoader('assets/new_wave_guideline.pdf')
+    file_path = 'assets/new_wave_guideline.pdf'
+    loader = AzureAIDocumentIntelligenceLoader(
+        api_endpoint=os.getenv('AZURE_COGNITIVE_ENDPOINT'), api_key=os.getenv('AZURE_COGNITIVE_KEY'), file_path=file_path, api_model="prebuilt-layout"
+    )
+      
     documents = loader.load()
+
+    # print(documents[0].page_content[:500]) 
     
     
     # split into chunks
     text_splitter = RecursiveCharacterTextSplitter(
-      separators=["\n", ".", "?", "!", ",", ";", ":", "\t", "\r", "\f"],
+      separators=["\n", "|"],
       chunk_size=1000,
       chunk_overlap=200,
       length_function=len

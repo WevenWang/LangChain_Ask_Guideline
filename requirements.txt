@@ -7,4 +7,5 @@ altair<5
 tiktoken==0.5.2
 openai==1.6.1
 pymupdf==1.23.26
+azure-ai-documentintelligence==1.0.0b2
 # langchain-openai==0.1.1
