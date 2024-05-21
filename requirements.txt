@@ -8,5 +8,6 @@ tiktoken
 openai
 pymupdf
 langchain_openai
+langchain-community
 
 # langchain-openai==0.1.1
